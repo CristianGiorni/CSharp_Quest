@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public enum DataType { Int, Float, Bool, String }
 
@@ -9,6 +10,9 @@ public class DataBlock : MonoBehaviour
     public DataType type = DataType.Bool;
     public string value = "true";
 
+    [Header("Texto que muestra el valor (opcional)")]
+    public TMP_Text label;
+
     public bool IsPlaced { get; private set; }
 
     private Rigidbody rb;
@@ -18,6 +22,18 @@ public class DataBlock : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         startPosition = transform.position;
+        UpdateLabel();
+    }
+
+    // Actualiza el texto tambien en el editor al cambiar el valor
+    void OnValidate()
+    {
+        UpdateLabel();
+    }
+
+    void UpdateLabel()
+    {
+        if (label != null) label.text = value;
     }
 
     void Update()
@@ -40,7 +56,7 @@ public class DataBlock : MonoBehaviour
     }
 
     // Rebote al ser rechazada: se aleja del punto indicado
-    public void Bounce(Vector3 fromPoint, float force = 6f)
+    public void Bounce(Vector3 fromPoint, float force = 4f)
     {
         Vector3 dir = transform.position - fromPoint;
         dir.y = 0f;
