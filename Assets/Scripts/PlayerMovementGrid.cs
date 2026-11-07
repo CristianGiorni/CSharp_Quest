@@ -49,11 +49,5 @@ public class PlayerMovementGrid : MonoBehaviour
         rb.linearVelocity = velocity;
     }
 
-    // Lo llama la ranura cuando rechaza una caja
-    public void Knockback(Vector3 direction, float speed, float duration)
-    {
-        direction.y = 0f;
-        knockbackVelocity = direction.normalized * speed;
-        knockbackTimeLeft = duration;
-    }
+   
 }

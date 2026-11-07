@@ -103,38 +103,12 @@ MonoBehaviour:
   expectedType: 2
   expectedValue: true
   snapPoint: {fileID: 1909183700251781731}
-  knockbackSpeed: 8
-  knockbackDuration: 0.3
   onSuccess:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1401410275104939117}
-        m_TargetAssemblyTypeName: SlotFeedback, Assembly-CSharp
-        m_MethodName: ShowSuccess
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onReject:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1401410275104939117}
-        m_TargetAssemblyTypeName: SlotFeedback, Assembly-CSharp
-        m_MethodName: ShowReject
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1401410275104939117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,7 +124,6 @@ MonoBehaviour:
   target: {fileID: 8464577767203106986}
   successColor: {r: 0.2, g: 0.85, b: 0.3, a: 1}
   rejectColor: {r: 0.95, g: 0.2, b: 0.2, a: 1}
-  flashDuration: 0.5
 --- !u!1 &6547361933719789477
 GameObject:
   m_ObjectHideFlags: 0

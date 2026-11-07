@@ -2,8 +2,8 @@ using UnityEngine;
 using TMPro;
 
 public enum DataType { Int, Float, Bool, String }
+public enum BlockState { InWorld, Carried, InSlot }
 
-[RequireComponent(typeof(Rigidbody))]
 public class DataBlock : MonoBehaviour
 {
     [Header("Dato que representa esta caja")]
@@ -13,15 +13,10 @@ public class DataBlock : MonoBehaviour
     [Header("Texto que muestra el valor (opcional)")]
     public TMP_Text label;
 
-    public bool IsPlaced { get; private set; }
-
-    private Rigidbody rb;
-    private Vector3 startPosition;
+    public BlockState State { get; private set; } = BlockState.InWorld;
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        startPosition = transform.position;
         UpdateLabel();
     }
 
@@ -36,40 +31,18 @@ public class DataBlock : MonoBehaviour
         if (label != null) label.text = value;
     }
 
-    void Update()
+    // La caja pasa al inventario del jugador y desaparece del mundo
+    public void PickUp()
     {
-        // Evita el soft-lock: R devuelve la caja a su posicion inicial
-        if (Input.GetKeyDown(KeyCode.R) && !IsPlaced)
-        {
-            ResetBlock();
-        }
+        State = BlockState.Carried;
+        gameObject.SetActive(false);
     }
 
-    // Fija la caja en la ranura y la deja inmovil
-    public void LockAt(Vector3 position)
+    // La caja aparece en la posicion de la ranura
+    public void PlaceAt(Vector3 position)
     {
-        IsPlaced = true;
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        rb.isKinematic = true;
+        State = BlockState.InSlot;
         transform.position = position;
-    }
-
-    // Rebote al ser rechazada: se aleja del punto indicado
-    public void Bounce(Vector3 fromPoint, float force = 4f)
-    {
-        Vector3 dir = transform.position - fromPoint;
-        dir.y = 0f;
-        rb.AddForce(dir.normalized * force, ForceMode.Impulse);
-    }
-
-    // Vuelve a su posicion inicial
-    public void ResetBlock()
-    {
-        IsPlaced = false;
-        rb.isKinematic = false;
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        transform.position = startPosition;
+        gameObject.SetActive(true);
     }
 }

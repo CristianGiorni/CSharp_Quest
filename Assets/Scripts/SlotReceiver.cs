@@ -8,19 +8,17 @@ public class SlotReceiver : MonoBehaviour
     public DataType expectedType = DataType.Bool;
     public string expectedValue = "true";
 
-    [Header("Donde queda la caja al encajar (centro de la caja)")]
+    [Header("Donde queda la caja al colocarla (centro de la caja)")]
     public Transform snapPoint;
-
-    [Header("Rechazo: retroceso del Player")]
-    public float knockbackSpeed = 8f;
-    public float knockbackDuration = 0.3f;
 
     [Header("Eventos")]
     public UnityEvent onSuccess;
     public UnityEvent onReject;
 
-    private bool solved;
-    private PlayerMovementGrid player;
+    public DataBlock Occupant { get; private set; }
+    public bool Solved { get; private set; }
+
+    private SlotFeedback feedback;
 
     // Al agregar el componente, el collider pasa a ser Trigger automaticamente
     void Reset()
@@ -28,42 +26,45 @@ public class SlotReceiver : MonoBehaviour
         GetComponent<Collider>().isTrigger = true;
     }
 
-    void Start()
+    void Awake()
     {
-        player = FindFirstObjectByType<PlayerMovementGrid>();
+        feedback = GetComponent<SlotFeedback>();
     }
 
-    void OnTriggerEnter(Collider other)
+    // Lo llama el jugador al colocar una caja. Devuelve false si la ranura esta ocupada.
+    public bool TryPlace(DataBlock block)
     {
-        if (solved) return;
+        if (Occupant != null || Solved) return false;
 
-        DataBlock block = other.GetComponentInParent<DataBlock>();
-        if (block == null || block.IsPlaced) return;
+        Occupant = block;
+        Vector3 pos = snapPoint != null ? snapPoint.position : transform.position;
+        block.PlaceAt(pos);
 
         bool correct = block.type == expectedType && block.value == expectedValue;
 
         if (correct)
         {
-            solved = true;
-            Vector3 pos = snapPoint != null ? snapPoint.position : transform.position;
-            block.LockAt(pos);
+            Solved = true;
+            if (feedback != null) feedback.ShowSuccess();
             onSuccess.Invoke();
         }
         else
         {
-            // La caja sale rebotada y el Player retrocede en la misma direccion,
-            // asi no queda pegado a la caja y el rebote se nota.
-            Vector3 away = block.transform.position - transform.position;
-            away.y = 0f;
-
-            block.Bounce(transform.position);
-
-            if (player != null)
-            {
-                player.Knockback(away, knockbackSpeed, knockbackDuration);
-            }
-
+            if (feedback != null) feedback.ShowReject();
             onReject.Invoke();
         }
+
+        return true;
+    }
+
+    // Lo llama el jugador para retirar una caja equivocada
+    public DataBlock TakeBack()
+    {
+        if (Occupant == null || Solved) return null;
+
+        DataBlock block = Occupant;
+        Occupant = null;
+        if (feedback != null) feedback.ShowEmpty();
+        return block;
     }
 }

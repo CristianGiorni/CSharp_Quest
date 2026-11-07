@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class SlotFeedback : MonoBehaviour
@@ -10,12 +9,8 @@ public class SlotFeedback : MonoBehaviour
     public Color successColor = new Color(0.2f, 0.85f, 0.3f);
     public Color rejectColor = new Color(0.95f, 0.2f, 0.2f);
 
-    [Header("Duracion del destello de rechazo (segundos)")]
-    public float flashDuration = 0.5f;
-
     private Material mat;
     private Color startColor;
-    private bool solved;
 
     void Awake()
     {
@@ -24,7 +19,6 @@ public class SlotFeedback : MonoBehaviour
         if (target == null)
         {
             Debug.LogWarning("SlotFeedback: falta asignar el Target (el objeto visual de la ranura).");
-            enabled = false;
             return;
         }
 
@@ -33,34 +27,26 @@ public class SlotFeedback : MonoBehaviour
         startColor = mat.color;
     }
 
-    // Conectar al evento On Success de SlotReceiver
+    // Verde fijo: la ranura quedo resuelta
     public void ShowSuccess()
     {
-        solved = true;
-        StopAllCoroutines();
-        mat.color = successColor;
+        SetColor(successColor);
     }
 
-    // Conectar al evento On Reject de SlotReceiver
+    // Rojo fijo hasta que el jugador retire la caja equivocada
     public void ShowReject()
     {
-        if (solved) return;
-        StopAllCoroutines();
-        StartCoroutine(Flash());
+        SetColor(rejectColor);
     }
 
-    private IEnumerator Flash()
+    // Vuelve al color de reposo
+    public void ShowEmpty()
     {
-        float t = 0f;
-        mat.color = rejectColor;
+        SetColor(startColor);
+    }
 
-        while (t < 1f)
-        {
-            t += Time.deltaTime / flashDuration;
-            mat.color = Color.Lerp(rejectColor, startColor, t);
-            yield return null;
-        }
-
-        mat.color = startColor;
+    private void SetColor(Color c)
+    {
+        if (mat != null) mat.color = c;
     }
 }

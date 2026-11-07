@@ -860,14 +860,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7408354450158847015, guid: b34329ea5a01c67459aa564c6ece1f8a, type: 3}
-      propertyPath: m_Mass
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 7408354450158847015, guid: b34329ea5a01c67459aa564c6ece1f8a, type: 3}
-      propertyPath: m_Constraints
-      value: 112
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -986,27 +978,55 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
       propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
+      propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
       propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
+      propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 9197951922543884218}
+    - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
       propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 1528814924}
     - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
+      propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
       propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
+      propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetActive
       objectReference: {fileID: 0}
     - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
       propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
       value: Activate
       objectReference: {fileID: 0}
     - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
+      propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
       propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
       value: InteractionReceiver, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
+      propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
+      propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3254696331133115870, guid: 537c2699548fbe24d81f600aa729f9bf, type: 3}
       propertyPath: onSuccess.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -1130,11 +1150,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: Puente_Bisagra
       objectReference: {fileID: 0}
+    - target: {fileID: 8967823625783248750, guid: b0aa9eb2bc41edc4eb6c40114c6e8e3a, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b0aa9eb2bc41edc4eb6c40114c6e8e3a, type: 3}
+--- !u!1 &9197951922543884218 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8929052971929248660, guid: b0aa9eb2bc41edc4eb6c40114c6e8e3a, type: 3}
+  m_PrefabInstance: {fileID: 9197951922543884217}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
