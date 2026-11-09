@@ -125,6 +125,13 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
+        // Sin intentos: hay que esperar a que se reinicie
+        if (nearSlot.IsLocked)
+        {
+            Say("La ranura se esta reiniciando. Espera " + Mathf.CeilToInt(nearSlot.Attempts.RemainingLock) + " s.");
+            return;
+        }
+
         // Ranura vacia: coloca la caja seleccionada
         if (items.Count == 0)
         {
@@ -145,10 +152,10 @@ public class PlayerInteraction : MonoBehaviour
         selected = items.Count - 1;
     }
 
-    void Say(string text)
+    void Say(string text, float seconds = 2f)
     {
         message = text;
-        messageTimer = 2f;
+        messageTimer = seconds;
     }
 
     string Describe(DataBlock b)
@@ -162,12 +169,28 @@ public class PlayerInteraction : MonoBehaviour
         {
             if (nearSlot.Solved) return "";
             if (nearSlot.Occupant != null) return interactKey + ": retirar la caja de la ranura";
+            if (nearSlot.IsLocked) return "";
             if (items.Count > 0) return interactKey + ": colocar " + Describe(items[selected]);
             return "";
         }
 
         if (nearBlock != null) return interactKey + ": recoger " + Describe(nearBlock);
         return "";
+    }
+
+    // Intentos restantes, o la pista con cuenta regresiva si la ranura esta bloqueada
+    string GetSlotInfo()
+    {
+        if (!SlotIsTarget() || nearSlot.Solved || nearSlot.Attempts == null) return "";
+
+        PuzzleAttempts a = nearSlot.Attempts;
+
+        if (a.IsLocked)
+        {
+            return a.hint + "\nReiniciando ranura... " + Mathf.CeilToInt(a.RemainingLock) + " s";
+        }
+
+        return "Intentos: " + a.HeartsLeft + "/" + a.maxHearts;
     }
 
     // HUD simple para el prototipo (despues se reemplaza por UI de verdad)
@@ -191,6 +214,16 @@ public class PlayerInteraction : MonoBehaviour
         if (items.Count > 1)
         {
             GUI.Label(new Rect(20, 55, 1400, 40), nextItemKey + " o numero: cambiar de caja", style);
+        }
+
+        string slotInfo = GetSlotInfo();
+        if (slotInfo != "")
+        {
+            GUIStyle info = new GUIStyle(style);
+            info.wordWrap = true;
+            info.alignment = TextAnchor.LowerLeft;
+            info.normal.textColor = new Color(1f, 0.85f, 0.3f);
+            GUI.Label(new Rect(20, Screen.height - 220, 1100, 110), slotInfo, info);
         }
 
         string prompt = GetPrompt();

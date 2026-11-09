@@ -28,6 +28,11 @@ public class TerminalUI : MonoBehaviour
     public TMP_Text feedbackText;
     public KeyCode closeKey = KeyCode.Escape;
 
+    [Header("Corazones (intentos)")]
+    public Image[] hearts;
+    public Color heartFull = new Color(0.9f, 0.2f, 0.25f);
+    public Color heartEmpty = new Color(0.25f, 0.25f, 0.3f);
+
     public bool IsOpen { get; private set; }
 
     private ConsoleTerminal current;
@@ -48,7 +53,15 @@ public class TerminalUI : MonoBehaviour
 
     void Update()
     {
-        if (IsOpen && Input.GetKeyDown(closeKey)) Close();
+        if (!IsOpen) return;
+
+        if (Input.GetKeyDown(closeKey))
+        {
+            Close();
+            return;
+        }
+
+        if (current != null && current.LockedUntil > 0f) UpdateLock();
     }
 
     public void Open(ConsoleTerminal console)
@@ -78,6 +91,9 @@ public class TerminalUI : MonoBehaviour
             spawned.Add(option);
         }
 
+        executeButton.interactable = !console.IsLocked;
+        RefreshHearts();
+
         panel.SetActive(true);
         LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)panel.transform);
 
@@ -97,7 +113,8 @@ public class TerminalUI : MonoBehaviour
 
     public void Say(string text)
     {
-        if (feedbackText != null) feedbackText.text = text;
+        if (feedbackText == null || feedbackText.text == text) return;
+        feedbackText.text = text;
     }
 
     // Muestra el texto, o oculta la linea si esta vacia
@@ -110,12 +127,10 @@ public class TerminalUI : MonoBehaviour
     // Boton "Ejecutar"
     private void Execute()
     {
-        if (!IsOpen || current == null) return;
-
+        if (!IsOpen || current == null || current.IsLocked) return;
 
         TerminalOption chosen = slot.Current;
-        Debug.Log("Boton Ejecutar presionado");
-        Debug.Log("Pieza en el hueco: " + (chosen != null ? chosen.value : "NINGUNA") + " | esperado: " + current.expectedValue);
+
         if (chosen == null)
         {
             Say("Arrastra una pieza al hueco [ ___ ] antes de ejecutar.");
@@ -130,12 +145,73 @@ public class TerminalUI : MonoBehaviour
             ConsoleTerminal solvedConsole = current;
             Close();
             solvedConsole.Solve();
+            return;
+        }
+
+        // Respuesta incorrecta: se pierde un corazon
+        string reason = string.IsNullOrEmpty(chosen.feedback) ? current.wrongLogicMessage : chosen.feedback;
+
+        current.HeartsLeft = Mathf.Max(0, current.HeartsLeft - 1);
+        RefreshHearts();
+        slot.Flash();
+        current.onWrongLogic.Invoke();
+
+        if (current.HeartsLeft <= 0)
+        {
+            LockTerminal();
         }
         else
         {
-            slot.Flash();
-            Say(string.IsNullOrEmpty(chosen.feedback) ? current.wrongLogicMessage : chosen.feedback);
-            current.onWrongLogic.Invoke();
+            string attempts = current.HeartsLeft == 1 ? " intento." : " intentos.";
+            Say(reason + "\nTe quedan " + current.HeartsLeft + attempts);
+        }
+    }
+
+    // Sin corazones: la terminal se reinicia (espera + pista), sin perder progreso del nivel
+    private void LockTerminal()
+    {
+        current.LockedUntil = Time.time + current.lockSeconds;
+        executeButton.interactable = false;
+
+        TerminalOption placed = slot.Current;
+        if (placed != null)
+        {
+            slot.Release(placed);
+            placed.ReturnHome();
+        }
+
+        UpdateLock();
+    }
+
+    private void UpdateLock()
+    {
+        float remaining = current.LockedUntil - Time.time;
+
+        if (remaining > 0f)
+        {
+            string wait = "Sin intentos. Reiniciando sistema... " + Mathf.CeilToInt(remaining) + " s";
+            Say(current.showHintOnLock && !string.IsNullOrEmpty(current.hint) ? current.hint + "\n" + wait : wait);
+            return;
+        }
+
+        // Termino la espera: vuelven los corazones
+        current.LockedUntil = 0f;
+        current.HeartsLeft = current.maxHearts;
+        executeButton.interactable = true;
+        RefreshHearts();
+        Say("Sistema reiniciado. Tenes de nuevo todos los intentos.");
+    }
+
+    private void RefreshHearts()
+    {
+        if (hearts == null || current == null) return;
+
+        for (int i = 0; i < hearts.Length; i++)
+        {
+            if (hearts[i] == null) continue;
+
+            hearts[i].gameObject.SetActive(i < current.maxHearts);
+            hearts[i].color = i < current.HeartsLeft ? heartFull : heartEmpty;
         }
     }
 

@@ -54,9 +54,26 @@ public class ConsoleTerminal : MonoBehaviour
     public UnityEvent onSolved;
     public UnityEvent onWrongLogic;
 
+    [Header("Corazones (intentos por terminal)")]
+    public int maxHearts = 3;
+    [Tooltip("Segundos de espera cuando se acaban los corazones")]
+    public float lockSeconds = 10f;
+    [TextArea(1, 3)] public string hint = "Pista: 100 es un numero entero, sin decimales ni texto.";
+    [Tooltip("Tildado: muestra la pista mientras la terminal se reinicia. Destildado: solo la cuenta regresiva, porque cada error ya muestra su explicacion.")]
+    public bool showHintOnLock = false;
+
+    public int HeartsLeft { get; set; }
+    public float LockedUntil { get; set; }
+    public bool IsLocked { get { return LockedUntil > 0f && Time.time < LockedUntil; } }
+
     private Transform player;
     private bool solved;
     private bool near;
+
+    void Awake()
+    {
+        HeartsLeft = maxHearts;
+    }
 
     void Start()
     {
@@ -85,7 +102,6 @@ public class ConsoleTerminal : MonoBehaviour
     public void Solve()
     {
         solved = true;
-        Debug.Log("Solve llamado. Acciones en On Solved: " + onSolved.GetPersistentEventCount());
         onSolved.Invoke();
     }
 
