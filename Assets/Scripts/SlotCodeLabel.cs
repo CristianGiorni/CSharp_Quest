@@ -11,6 +11,10 @@ public class SlotCodeLabel : MonoBehaviour
     [Header("Codigo (usa [ ___ ] donde va la caja)")]
     [TextArea(1, 6)] public string codeTemplate = "bool puenteActivo = [ ___ ];\nif (puenteActivo) BajarPuente();";
 
+    [Header("Posicion")]
+    [Tooltip("Cuanto se adelanta el cartel hacia la camara. Con camara ortografica no cambia como se ve, pero evita que lo tapen las paredes.")]
+    public float cameraOffset = 6f;
+
     [Header("Colores")]
     public Color codeColor = Color.white;
     public Color blankColor = new Color(1f, 0.85f, 0.3f);
@@ -19,10 +23,12 @@ public class SlotCodeLabel : MonoBehaviour
 
     private const string Blank = "[ ___ ]";
     private Camera cam;
+    private Vector3 baseLocalPosition;
 
     void Awake()
     {
         cam = Camera.main;
+        baseLocalPosition = transform.localPosition;
         ShowEmpty();
     }
 
@@ -30,7 +36,13 @@ public class SlotCodeLabel : MonoBehaviour
     void LateUpdate()
     {
         if (cam == null) cam = Camera.main;
-        if (cam != null) transform.rotation = cam.transform.rotation;
+        if (cam == null) return;
+
+        transform.rotation = cam.transform.rotation;
+
+        // Se adelanta hacia la camara para quedar siempre delante de las paredes
+        Vector3 anchor = transform.parent != null ? transform.parent.TransformPoint(baseLocalPosition) : baseLocalPosition;
+        transform.position = anchor - cam.transform.forward * cameraOffset;
     }
 
     // Hueco vacio: la ranura esta esperando una caja

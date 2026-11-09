@@ -33,6 +33,7 @@ public class TerminalSlot : MonoBehaviour, IDropHandler
         if (checkType && option.type != expectedType)
         {
             Flash();
+            AudioManager.Reject();
             if (TerminalUI.Instance != null)
             {
                 TerminalUI.Instance.Say("El tipo no coincide: este hueco espera un " + expectedType.ToString().ToLower() + ".");

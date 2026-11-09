@@ -10,6 +10,7 @@ public class InteractionReceiver : MonoBehaviour
     // Se llama desde el evento onSuccess de la ranura
     public void Activate()
     {
+        AudioManager.Door();
         StopAllCoroutines();
         StartCoroutine(Animate());
     }

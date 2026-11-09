@@ -27,6 +27,8 @@ public class Elevator : MonoBehaviour
     public UnityEvent onOpened;
     public UnityEvent onLevelCompleted;
 
+    private float levelStartTime;
+    private float levelSeconds;
     private bool opened;
     private bool completed;
     private Vector3 leftClosed;
@@ -35,6 +37,9 @@ public class Elevator : MonoBehaviour
 
     void Awake()
     {
+        LevelStats.Reset();
+        levelStartTime = Time.time;
+
         if (leftDoor != null) leftClosed = leftDoor.localPosition;
         if (rightDoor != null) rightClosed = rightDoor.localPosition;
 
@@ -62,6 +67,7 @@ public class Elevator : MonoBehaviour
     {
         if (opened) return;
         opened = true;
+        AudioManager.Elevator();
         StartCoroutine(OpenRoutine());
     }
 
@@ -117,6 +123,8 @@ public class Elevator : MonoBehaviour
     private void CompleteLevel(Collider playerCollider)
     {
         completed = true;
+        levelSeconds = Time.time - levelStartTime;
+        AudioManager.LevelComplete();
 
         PlayerMovementGrid movement = playerCollider.GetComponentInParent<PlayerMovementGrid>();
         PlayerInteraction interaction = movement.GetComponent<PlayerInteraction>();
@@ -133,24 +141,45 @@ public class Elevator : MonoBehaviour
     {
         if (!completed) return;
 
-        GUI.color = new Color(0f, 0f, 0f, 0.65f);
+        GUI.color = new Color(0f, 0f, 0f, 0.75f);
         GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
         GUI.color = Color.white;
 
+        float scale = Screen.height / 1080f;
+
         GUIStyle title = new GUIStyle(GUI.skin.label);
-        title.fontSize = 64;
+        title.fontSize = Mathf.RoundToInt(64 * scale);
         title.fontStyle = FontStyle.Bold;
         title.alignment = TextAnchor.MiddleCenter;
         title.normal.textColor = new Color(0.4f, 1f, 0.5f);
 
         GUIStyle sub = new GUIStyle(GUI.skin.label);
-        sub.fontSize = 30;
+        sub.fontSize = Mathf.RoundToInt(34 * scale);
         sub.alignment = TextAnchor.MiddleCenter;
         sub.normal.textColor = Color.white;
 
-        string hint = string.IsNullOrEmpty(nextSceneName) ? "Enter: jugar de nuevo" : "Enter: siguiente nivel";
+        int minutes = Mathf.FloorToInt(levelSeconds / 60f);
+        int seconds = Mathf.FloorToInt(levelSeconds % 60f);
+        int total = LevelStats.TotalMistakes;
 
-        GUI.Label(new Rect(0, Screen.height * 0.35f, Screen.width, 100), "NIVEL COMPLETADO", title);
-        GUI.Label(new Rect(0, Screen.height * 0.35f + 100, Screen.width, 60), hint, sub);
+        float y = Screen.height * 0.25f;
+        GUI.Label(new Rect(0, y, Screen.width, 90 * scale), "NIVEL COMPLETADO", title);
+        y += 130 * scale;
+
+        GUI.Label(new Rect(0, y, Screen.width, 50 * scale), "Tiempo: " + minutes + ":" + seconds.ToString("00"), sub);
+        y += 60 * scale;
+        GUI.Label(new Rect(0, y, Screen.width, 50 * scale), "Errores: " + total, sub);
+        y += 90 * scale;
+
+        GUIStyle legend = new GUIStyle(sub);
+        legend.fontStyle = FontStyle.Italic;
+        legend.normal.textColor = new Color(1f, 0.9f, 0.5f);
+        GUI.Label(new Rect(0, y, Screen.width, 50 * scale), "Equivocarse es parte de aprender. Pasa los puzles otra vez si queres practicar.", legend);
+        y += 100 * scale;
+
+        string hint = string.IsNullOrEmpty(nextSceneName) ? "Enter: jugar de nuevo" : "Enter: siguiente nivel";
+        sub.fontSize = Mathf.RoundToInt(28 * scale);
+        sub.normal.textColor = new Color(0.8f, 0.8f, 0.8f);
+        GUI.Label(new Rect(0, y, Screen.width, 44 * scale), hint, sub);
     }
 }

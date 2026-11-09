@@ -24,6 +24,9 @@ public class PlayerInteraction : MonoBehaviour
 
     void Update()
     {
+        // En pausa no se interactua
+        if (Time.timeScale == 0f) return;
+
         FindTargets();
         HandleSelection();
 
@@ -147,6 +150,7 @@ public class PlayerInteraction : MonoBehaviour
 
     void AddItem(DataBlock block)
     {
+        AudioManager.Pickup();
         block.PickUp();
         items.Add(block);
         selected = items.Count - 1;

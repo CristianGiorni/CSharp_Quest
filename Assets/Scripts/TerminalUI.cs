@@ -70,6 +70,7 @@ public class TerminalUI : MonoBehaviour
 
         current = console;
         IsOpen = true;
+        AudioManager.Click();
 
         SetCode(topText, console.codeTop);
         SetCode(leftText, console.codeBeforeSlot);
@@ -142,6 +143,7 @@ public class TerminalUI : MonoBehaviour
 
         if (correct)
         {
+            AudioManager.Success();
             ConsoleTerminal solvedConsole = current;
             Close();
             solvedConsole.Solve();
@@ -149,6 +151,8 @@ public class TerminalUI : MonoBehaviour
         }
 
         // Respuesta incorrecta: se pierde un corazon
+        AudioManager.Reject();
+        LevelStats.Mistake(current.Label);
         string reason = string.IsNullOrEmpty(chosen.feedback) ? current.wrongLogicMessage : chosen.feedback;
 
         current.HeartsLeft = Mathf.Max(0, current.HeartsLeft - 1);

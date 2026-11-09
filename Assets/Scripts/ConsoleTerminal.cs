@@ -23,9 +23,12 @@ public class ConsoleTerminal : MonoBehaviour
 {
     [Header("Codigo que se muestra (los textos vacios se ocultan)")]
     [TextArea(2, 6)] public string codeTop = "// Falta declarar la variable de energia\n// Elegi su tipo de dato";
-    public string codeBeforeSlot = "";
-    public string codeAfterSlot = " energia = 100;";
+    [TextArea(1, 4)] public string codeBeforeSlot = "";
+    [TextArea(1, 4)] public string codeAfterSlot = " energia = 100;";
     [TextArea(2, 6)] public string codeBottom = "";
+
+    [Header("Nombre del puzle en el resumen final (vacio = nombre del objeto)")]
+    public string puzzleLabel = "";
 
     [Header("Respuesta correcta")]
     [Tooltip("Tildado: el hueco solo acepta piezas del tipo indicado (puzles de valores). Destildado: acepta cualquiera y se valida al ejecutar (puzles de elegir el tipo).")]
@@ -66,6 +69,11 @@ public class ConsoleTerminal : MonoBehaviour
     public float LockedUntil { get; set; }
     public bool IsLocked { get { return LockedUntil > 0f && Time.time < LockedUntil; } }
 
+    public string Label
+    {
+        get { return string.IsNullOrEmpty(puzzleLabel) ? gameObject.name : puzzleLabel; }
+    }
+
     private Transform player;
     private bool solved;
     private bool near;
@@ -85,6 +93,9 @@ public class ConsoleTerminal : MonoBehaviour
     {
         near = false;
 
+        // En pausa no se puede abrir la consola
+        if (Time.timeScale == 0f) return;
+
         if (solved || player == null) return;
         if (TerminalUI.Instance == null || TerminalUI.Instance.IsOpen) return;
 
@@ -102,6 +113,7 @@ public class ConsoleTerminal : MonoBehaviour
     public void Solve()
     {
         solved = true;
+        LevelStats.Solved(Label);
         onSolved.Invoke();
     }
 

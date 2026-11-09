@@ -8,6 +8,9 @@ public class SlotReceiver : MonoBehaviour
     public DataType expectedType = DataType.Bool;
     public string expectedValue = "true";
 
+    [Header("Nombre del puzle en el resumen final (vacio = nombre del objeto)")]
+    public string puzzleLabel = "";
+
     [Header("Donde queda la caja al colocarla (centro de la caja)")]
     public Transform snapPoint;
 
@@ -24,6 +27,11 @@ public class SlotReceiver : MonoBehaviour
     public bool IsLocked
     {
         get { return Attempts != null && Attempts.IsLocked; }
+    }
+
+    public string Label
+    {
+        get { return string.IsNullOrEmpty(puzzleLabel) ? gameObject.name : puzzleLabel; }
     }
 
     private SlotFeedback feedback;
@@ -59,11 +67,15 @@ public class SlotReceiver : MonoBehaviour
         if (correct)
         {
             Solved = true;
+            LevelStats.Solved(Label);
+            AudioManager.Success();
             if (feedback != null) feedback.ShowSuccess();
             onSuccess.Invoke();
         }
         else
         {
+            AudioManager.Reject();
+            LevelStats.Mistake(Label);
             if (Attempts != null) Attempts.RegisterMistake();
             if (feedback != null) feedback.ShowReject();
             onReject.Invoke();
