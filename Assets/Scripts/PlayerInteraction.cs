@@ -10,6 +10,13 @@ public class PlayerInteraction : MonoBehaviour
     public float interactRadius = 1.6f;
     public KeyCode interactKey = KeyCode.E;
     public KeyCode nextItemKey = KeyCode.Q;
+    public KeyCode dropKey = KeyCode.G;
+
+    [Header("Soltar caja")]
+    [Tooltip("A que distancia delante del jugador cae la caja")]
+    public float dropDistance = 1.3f;
+    [Tooltip("Capas que bloquean el lugar donde se suelta (paredes, objetos)")]
+    public LayerMask dropBlockers = ~0;
 
     private readonly List<DataBlock> items = new List<DataBlock>();
     private int selected;
@@ -19,20 +26,68 @@ public class PlayerInteraction : MonoBehaviour
     private float blockDistance;
     private float slotDistance;
 
+    private Rigidbody body;
+    private Vector3 lastMoveDir = Vector3.forward;
+
     private string message = "";
     private float messageTimer;
+
+    void Awake()
+    {
+        body = GetComponent<Rigidbody>();
+    }
 
     void Update()
     {
         // En pausa no se interactua
         if (Time.timeScale == 0f) return;
 
+        TrackDirection();
         FindTargets();
         HandleSelection();
 
         if (Input.GetKeyDown(interactKey)) Interact();
+        if (Input.GetKeyDown(dropKey)) DropSelected();
 
         if (messageTimer > 0f) messageTimer -= Time.deltaTime;
+    }
+
+    // Recuerda hacia donde se esta moviendo el jugador, para soltar la caja adelante
+    void TrackDirection()
+    {
+        if (body == null) return;
+
+        Vector3 v = body.linearVelocity;
+        v.y = 0f;
+        if (v.sqrMagnitude > 0.05f) lastMoveDir = v.normalized;
+    }
+
+    // Suelta la caja seleccionada en el suelo, delante del jugador
+    void DropSelected()
+    {
+        if (items.Count == 0)
+        {
+            Say("No tenes cajas para soltar");
+            return;
+        }
+
+        // No soltar dentro de una pared: si hay algo delante, la caja cae mas cerca
+        Vector3 origin = transform.position;
+        float distance = dropDistance;
+
+        RaycastHit hit;
+        if (Physics.Raycast(origin, lastMoveDir, out hit, dropDistance + 0.5f, dropBlockers, QueryTriggerInteraction.Ignore)
+            && hit.collider.GetComponentInParent<DataBlock>() == null)
+        {
+            distance = Mathf.Max(0.3f, hit.distance - 0.6f);
+        }
+
+        DataBlock block = items[selected];
+        items.RemoveAt(selected);
+        selected = Mathf.Clamp(selected, 0, Mathf.Max(0, items.Count - 1));
+
+        block.DropAt(origin + lastMoveDir * distance);
+        AudioManager.Click();
     }
 
     // Busca la caja y la ranura mas cercanas dentro del radio
@@ -100,7 +155,7 @@ public class PlayerInteraction : MonoBehaviour
     {
         if (items.Count >= capacity)
         {
-            Say("Inventario lleno");
+            Say("Inventario lleno. " + dropKey + ": soltar una caja");
             return;
         }
 
@@ -120,7 +175,7 @@ public class PlayerInteraction : MonoBehaviour
         {
             if (items.Count >= capacity)
             {
-                Say("Inventario lleno");
+                Say("Inventario lleno. " + dropKey + ": soltar una caja");
                 return;
             }
 
@@ -215,9 +270,11 @@ public class PlayerInteraction : MonoBehaviour
 
         GUI.Label(new Rect(20, 20, 1400, 40), inv, style);
 
-        if (items.Count > 1)
+        if (items.Count > 0)
         {
-            GUI.Label(new Rect(20, 55, 1400, 40), nextItemKey + " o numero: cambiar de caja", style);
+            string help = dropKey + ": soltar la caja seleccionada";
+            if (items.Count > 1) help = nextItemKey + " o numero: cambiar de caja   |   " + help;
+            GUI.Label(new Rect(20, 55, 1400, 40), help, style);
         }
 
         string slotInfo = GetSlotInfo();

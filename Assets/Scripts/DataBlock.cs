@@ -15,8 +15,11 @@ public class DataBlock : MonoBehaviour
 
     public BlockState State { get; private set; } = BlockState.InWorld;
 
+    private float restY;
+
     void Awake()
     {
+        restY = transform.position.y;
         UpdateLabel();
     }
 
@@ -36,6 +39,22 @@ public class DataBlock : MonoBehaviour
     {
         State = BlockState.Carried;
         gameObject.SetActive(false);
+    }
+
+    // El jugador suelta la caja en el suelo (conserva la altura a la que estaba al inicio)
+    public void DropAt(Vector3 position)
+    {
+        State = BlockState.InWorld;
+        position.y = restY;
+        transform.position = position;
+        gameObject.SetActive(true);
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
     }
 
     // La caja aparece en la posicion de la ranura

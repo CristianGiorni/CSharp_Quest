@@ -5814,7 +5814,7 @@ MonoBehaviour:
   - {fileID: 2076161301}
   offColor: {r: 0.85, g: 0.15, b: 0.15, a: 1}
   onColor: {r: 0.2, g: 0.9, b: 0.3, a: 1}
-  nextSceneName: 
+  nextSceneName: Nivel2
   onOpened:
     m_PersistentCalls:
       m_Calls: []
