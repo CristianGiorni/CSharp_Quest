@@ -219,7 +219,12 @@ public class PlayerInteraction : MonoBehaviour
 
     string Describe(DataBlock b)
     {
-        return b.type.ToString().ToLower() + " " + b.value;
+        string typeName = b.type.ToString().ToLower();
+
+        // Si el valor ya es el nombre del tipo (cajas del nivel 1), no se repite: "int" en vez de "int int"
+        if (string.Equals(b.value, typeName, System.StringComparison.OrdinalIgnoreCase)) return typeName;
+
+        return typeName + " " + b.value;
     }
 
     string GetPrompt()

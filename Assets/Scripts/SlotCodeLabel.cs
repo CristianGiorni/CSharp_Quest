@@ -75,6 +75,9 @@ public class SlotCodeLabel : MonoBehaviour
         switch (block.type)
         {
             case DataType.String:
+                // Si el valor ya trae comillas, no se duplican
+                if (block.value.Length >= 2 && block.value.StartsWith("\"") && block.value.EndsWith("\""))
+                    return block.value;
                 return "\"" + block.value + "\"";
             case DataType.Float:
                 return block.value.EndsWith("f") ? block.value : block.value + "f";

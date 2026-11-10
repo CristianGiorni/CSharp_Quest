@@ -96,12 +96,23 @@ public class PauseMenu : MonoBehaviour
         if (paused) return;
         if (Time.realtimeSinceStartup - startTime > controlsHintSeconds) return;
 
-        GUIStyle style = new GUIStyle(GUI.skin.label);
-        style.fontSize = 22;
-        style.alignment = TextAnchor.UpperRight;
-        style.normal.textColor = new Color(1f, 1f, 1f, 0.9f);
+        float scale = Screen.height / 1080f;
 
-        GUI.Label(new Rect(Screen.width - 640, 20, 620, 160),
-            "WASD: mover\nE: interactuar\nQ o 1-3: cambiar de caja\nEsc: pausa", style);
+        GUIStyle style = new GUIStyle(GUI.skin.label);
+        style.fontSize = Mathf.RoundToInt(22 * scale);
+        style.alignment = TextAnchor.MiddleLeft;
+        style.padding = new RectOffset(16, 16, 8, 8);
+        style.normal.textColor = new Color(1f, 1f, 1f, 0.95f);
+
+        float width = 460f * scale;
+        float height = 190f * scale;
+        Rect box = new Rect(Screen.width - width - 20f, Screen.height - height - 20f, width, height);
+
+        // Fondo oscuro semitransparente para que se lea sobre cualquier escena
+        GUI.color = new Color(0f, 0f, 0f, 0.55f);
+        GUI.DrawTexture(box, Texture2D.whiteTexture);
+        GUI.color = Color.white;
+
+        GUI.Label(box, "WASD: mover\nE: interactuar\nQ o 1-3: cambiar de caja\nG: soltar la caja\nEsc: pausa", style);
     }
 }
